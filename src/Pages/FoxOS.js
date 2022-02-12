@@ -115,43 +115,16 @@ export default class FoxOS extends Component {
     }
 
     render() {
-        /* return (
-            <div>
-                <div className="header">
-                    <a className="logo_Dark">DarkPhysic</a>
-                    <NavLink to="/" className="nav-link">О нас</NavLink>
-                    <NavLink to="/" className="nav-link">Видео-уроки</NavLink>
-                    <NavLink to="/textlessons" className="nav-link">Текстовые-уроки</NavLink>
-                    <NavLink to="/physicconst" className="nav-link">Физические постоянные</NavLink>
-                </div>
-                <div className="Container">
-                    <a><p style={{"color": "red"}}>{this.state.error}</p></a>
-                    <form onSubmit={this.Submit}>
-                        <label><p>Элемент</p></label>
-                        <input onChange={this.input} id="element_name"/>
-                        <label><p>Его постоянная величина</p></label>
-                        <input onChange={this.input} id="const_value"/>
-                        <label><p>Автор</p></label>
-                        <input onChange={this.input} id="author"/>
-                        <label><p>Название</p></label>
-                        <input onChange={this.input} id="name"/>
-                        <p>
-                            <button type="submit">a</button>
-                        </p>
-                    </form>
-                </div>
-
-         */
         return (
             <div>
                 <div className="display">
                     <div className="panel-element">
-                        <img id="window" onClick={this.openWindow} alt="const-logo" className="fox-elements ondisplay nonselect"
-                             src={const_logo}/>
+                        <img id="window" onClick={this.openWindow} alt="const-logo"
+                             className="fox-elements ondisplay nonselect" src={const_logo}/>
                     </div>
                     <div className="panel-element">
-                        <img id="fox" onClick={this.openWindow} alt="const-logo" className="fox-elements ondisplay nonselect"
-                             src={fox_logo}/>
+                        <img id="fox" onClick={this.openWindow} alt="const-logo"
+                             className="fox-elements ondisplay nonselect" src={fox_logo}/>
                     </div>
                     <div style={{"top": this.state.windowy, "left": this.state.windowx, "zIndex": this.state.windowz}}
                          className="window-app">
@@ -167,23 +140,35 @@ export default class FoxOS extends Component {
                          className="window-app blue-background">
                         <div id="fox" onMouseDown={this.mousedown} onMouseUp={this.mouseup}
                              className="window-app-header">
-                            <a className="nonselect">Физические непостоянные</a>
+                            <a className="nonselect">Добавить физ. постоянную</a>
                             <div onClick={this.close} className="closebutton">
                                 <a сlassName="nonselect" onClick={this.close}>X</a>
                             </div>
                         </div>
+                        <a><p style={{"color": "red"}}>{this.state.error}</p></a>
+                        <form onSubmit={this.Submit}>
+                            <label><p>Элемент</p></label>
+                            <input onChange={this.input} id="element_name"/>
+                            <label><p>Его постоянная величина</p></label>
+                            <input onChange={this.input} id="const_value"/>
+                            <label><p>Автор</p></label>
+                            <input onChange={this.input} id="author"/>
+                            <label><p>Название</p></label>
+                            <input onChange={this.input} id="name"/>
+                            <p>
+                                <button type="submit">Добавить новую постоянную</button>
+                            </p>
+                        </form>
                     </div>
                 </div>
                 <div className="panel-bar">
                     <div className="panel-element">
                         <img style={{"outline": this.state.foxo + "px solid red"}} id="fox" onClick={this.openWindow}
-                             alt="lis-logo" className="fox-elements"
-                             src={fox_logo}/>
+                             alt="lis-logo" className="fox-elements" src={fox_logo}/>
                     </div>
                     <div className="panel-element">
                         <img style={{"outline": this.state.windowo + "px solid red"}} id="window"
-                             onClick={this.openWindow} alt="const-logo" className="fox-elements"
-                             src={const_logo}/>
+                             onClick={this.openWindow} alt="const-logo" className="fox-elements" src={const_logo}/>
                     </div>
                 </div>
             </div>
