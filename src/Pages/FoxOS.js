@@ -4,7 +4,7 @@ import Service from "../Services/Service";
 import fox_logo from "../Image/lis-logo.png"
 import const_logo from "../Image/const.png"
 import addconst_logo from "../Image/addconst.png"
-
+import {FoxWindow, GetConstants, AddConstants} from "./Windows";
 let parse = require("html-react-parser")
 let service = new Service();
 let isDown = false;
@@ -15,7 +15,7 @@ export default class FoxOS extends Component {
     touch_y = 0;
     windowname = "";
     page = 1
-    windows = ["getconst", "addconst"]
+    windows = ["getconst", "addconst", "foxwindow"]
 
     constructor(props) {
         super(props);
@@ -135,7 +135,7 @@ export default class FoxOS extends Component {
         array_stepen.forEach(stepen => {
             str = str.replace(stepen, "<sup>" + stepen[0].replace("^", "") + "</sup>")
         })
-        let best_substepen = str.matchAll("\\|[\\S]\\s*")
+        let best_substepen = str.matchAll("\\|[\\S]*\\s*")
         let array_substepen = [...best_substepen]
         array_substepen.forEach(substepen => {
             str = str.replace(substepen, "<sub>" + substepen[0].replace("|", "") + "</sub>")
@@ -172,37 +172,6 @@ export default class FoxOS extends Component {
         this.GetConstants(this.page);
     }
 
-    window() {
-        let data = this.state.constants_elements
-        return (
-            <div style={{
-                "top": this.state.getconsty,
-                "left": this.state.getconstx,
-                "zIndex": this.state.getconstz,
-                "height": "700px"
-            }}
-                 className="window-app">
-                {this.standart_header("Физические постоянные", "getconst")}
-                {data.map((values, index) => {
-                    return (
-                        <div className="downline" key={index}>
-                            <a className="black-a">{this.formater(data[index].element_name)}</a>
-                            <a className="black-a"> - {data[index].name} - </a>
-                            <a className="black-a border-red"> {this.formater(data[index].const_value)}</a>
-                            <p className="black-a"> Автор: {data[index].author}</p>
-                            <p className="black-a"> Описание: {data[index].description}</p>
-                        </div>
-                    )
-                })
-                }
-                <div className="buttondown">
-                    <button style={{"fontSize": "20px", "color": "black"}} onClick={this.backpage}>←</button>
-                    <button style={{"fontSize": "20px", "color": "black"}} onClick={this.newpage}>→</button>
-                </div>
-            </div>
-        )
-    }
-
     render() {
         return (
             <div>
@@ -215,38 +184,16 @@ export default class FoxOS extends Component {
                         <img id="addconst" onClick={this.openWindow} alt="const-logo"
                              className="fox-elements ondisplay nonselect" src={addconst_logo}/>
                     </div>
-                    {this.window()}
-                    {/* Окно добавления объекта*/}
-                    <div style={{
-                        "top": this.state.addconsty,
-                        "left": this.state.addconstx,
-                        "zIndex": this.state.addconstz
-                    }}
-                         className="window-app blue-background garry-background">
-                        {this.standart_header("Добавить Физ.Постоянную", "addconst")}
-                        <a><p style={{"color": "red"}}>{this.state.error}</p></a>
-                        <a><p style={{"color": "darkgreen"}}>{this.state.response}</p></a>
-                        <form onSubmit={this.Submit}>
-                            <label><p className="nonselect">Элемент</p></label>
-                            <input onChange={this.input} id="element_name"/>
-                            <label><p className="nonselect">Его постоянная величина</p></label>
-                            <input onChange={this.input} id="const_value"/>
-                            <label><p className="nonselect">Автор</p></label>
-                            <input onChange={this.input} id="author"/>
-                            <label><p className="nonselect">Название</p></label>
-                            <input onChange={this.input} id="name"/>
-                            <label><p className="nonselect">Описание</p></label>
-                            <input onChange={this.input} id="description"/>
-                            <p>
-                                <button className="nonselect" type="submit">Добавить новую постоянную</button>
-                            </p>
-                        </form>
-                    </div>
+                    {GetConstants(this)}
+                    {FoxWindow(this)}
+                    {AddConstants(this)}
                 </div>
                 {/* Панель снизу */}
                 <div className="panel-bar">
                     <div className="panel-element">
-                        <img id="fox" onClick={this.openWindow} alt="lis-logo" className="fox-elements nonselect"
+                        <img style={{"outline": this.state.foxwindowo + "px solid red"}}
+                             id="foxwindow" onClick={this.openWindow} alt="lis-logo"
+                             className="fox-elements nonselect"
                              src={fox_logo}/>
                     </div>
                     <div className="panel-element">
