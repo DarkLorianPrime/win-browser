@@ -1,19 +1,45 @@
+import phystube_logo from "../Image/phystube.png";
+import restart_page from "../Image/restart-page.png"
+import {updatePage} from "../Utils/WindowsWorker";
+import Service from "../Services/Service";
+
+let service = new Service();
+
+export function standart_header(name, id) {
+    return (
+        <div id={id} onMouseDown={this.mousedown} onMouseUp={this.mouseup}
+             className="window-app-header">
+            <a className="nonselect">{name}</a>
+            <div onClick={this.closeWindow} className="closebutton">
+                <a className="nonselect" onClick={this.closeWindow}>X</a>
+            </div>
+        </div>
+    )
+}
+
 export function FoxWindow(self) {
     return (<div style={{
         "top": self.state.foxwindowy, "left": self.state.foxwindowx, "zIndex": self.state.foxwindowz
-    }} className="window-app blue-background what-background">
+    }} className="window-app blue-background">
         {self.standart_header("FoxOS", "foxwindow")}
         <div>
-            <p><a>TEXT</a></p>
-            <p><a>TEXT</a></p>
-            <p><a>TEXT</a></p>
-            <p><a>TEXT</a></p>
-            <p><a>TEXT</a></p>
+            <p><a>OS: FoxOS</a></p>
+            <p><a>CPU: FoxCore9-990l</a></p>
+            <p><a>GPU: Foxidea FTX 2080 FI</a></p>
+            <p><a>Права на OS полностью принадлежат Александру Касимову</a></p>
+            <p><a>Город: Ульяновск</a></p>
+            <p><a>Учебное заведение: Колледж Экономики и Информатики им. А. Н. Афанасьева</a></p>
+            <p><a>Тема: физика - просто!</a></p>
+            <p><a>Язык программирования: React + Django Rest Framework</a></p>
+            <p><a>Дизайн: Весь дизайн был написан полностью с нуля Александром Касимовым. Часть пруфов заснята.</a></p>
+            <p><a>Спец. символы:</a></p>
+            <p><a>Для возведения в степень нужно указать 2^2 {self.formater("2^2")}</a></p>
+            <p><a>Для возведения в индекс нужно указать 2|2 {self.formater("2|2")}</a></p>
         </div>
     </div>)
 }
 
-export function GetConstants(self) {
+export function getConstants(self) {
     let data = self.state.constants_elements
     return (
         <div style={{
@@ -69,6 +95,96 @@ export function AddConstants(self) {
                     <button className="nonselect" type="submit">Добавить новую постоянную</button>
                 </p>
             </form>
+        </div>
+    )
+}
+
+function BrowserMain(self) {
+
+}
+
+export function BrowserFirstPage(self) {
+    return (
+        <div>
+            <div style={{
+                "top": self.state.browsery, "left": self.state.browserx, "zIndex": self.state.browserz, "width": "900px"
+            }} className="window-app blue-background what-background">
+                {self.standart_header("PhysBrowser", "browser")}
+                <div className="search-line" onClick={self.updatePage}>
+                    <img className={self.state.searching} src={restart_page} alt="restart"/>
+                    <a className="search-element">DarkFox.phys</a>
+                </div>
+                <p><a>PhysBrowser</a></p>
+                <a><span style={{"color": "red"}}>Лучший</span> браузер для изучения физики.</a>
+                <p><a>Введите свой запрос:</a></p>
+                <p><input disabled="disabled" value="Поле ввода времено недоступно."/></p>
+                <p><a>Ваши закладки:</a></p>
+                <div onClick={() => self.setState({browser_page: "physTube"})} className="icon-browser"><img
+                    className="img-browser" src={phystube_logo} alt="brow_ic"/><p
+                    style={{"margin": "0"}}><a>PhysTube</a></p></div>
+                <div className="icon-browser"><img className="img-browser" src={phystube_logo} alt="brow_ic"/><p
+                    style={{"margin": "0"}}><a>PhysTube</a></p></div>
+                <div className="icon-browser"><img className="img-browser" src={phystube_logo} alt="brow_ic"/><p
+                    style={{"margin": "0"}}><a>PhysTube</a></p></div>
+                <div className="icon-browser"><img className="img-browser" src={phystube_logo} alt="brow_ic"/><p
+                    style={{"margin": "0"}}><a>PhysTube</a></p></div>
+            </div>
+        </div>
+    )
+}
+
+export function BrowserPhysTubePage(self) {
+    return (
+        <div>
+            <div style={{
+                "top": self.state.browsery, "left": self.state.browserx, "zIndex": self.state.browserz, "width": "900px"
+            }} className="window-app blue-background what-background">
+                {self.standart_header("PhysBrowser", "browser")}
+                <div className="search-line" onClick={self.updatePage}>
+                    <button className="search-element" onClick={() => self.setState({browser_page: "first"})}>←</button>
+                    <img className={self.state.searching} src={restart_page} alt="restart"/>
+                    <a className="search-element">DarkFox.phys/phystube/</a>
+                </div>
+                <p><a>PhysTube</a><a style={{"marginLeft": "20px"}}
+                                     onClick={() => self.setState({browser_page: "addcontent"})}>Хочешь стать креатором?
+                    Тебе сюда!</a></p>
+                <input/>
+            </div>
+        </div>
+    )
+}
+
+export function BrowserAddPhysTubePage(self) {
+    return (
+        <div>
+            <div style={{
+                "top": self.state.browsery, "left": self.state.browserx, "zIndex": self.state.browserz, "width": "900px"
+            }} className="window-app blue-background what-background">
+                {self.standart_header("PhysBrowser", "browser")}
+                <div className="search-line" onClick={self.updatePage}>
+                    <button className="search-element" onClick={() => self.setState({browser_page: "physTube"})}>←
+                    </button>
+                    <img className={self.state.searching} src={restart_page} alt="restart"/>
+                    <a className="search-element">DarkFox.phys/phystube/create</a>
+                </div>
+                <p><a>PhysTube - </a><a style={{"color": "red"}}> CREATORS</a></p>
+                <form>
+                    <p><a>Добавить новый раздел</a></p>
+                    <input/>
+                </form>
+                <p><a>Добавить новое видео</a></p>
+                <p><a>Выберите раздел, куда нужно добавить видео</a></p>
+                <form>
+                    <select>
+                        {self.state.chapters.map((values, index) => {
+                            return (
+                                <option value={values["id"]}>{values["name"]}</option>
+                            )
+                        })}
+                    </select>
+                    <input/>
+                </form>
+            </div>
         </div>
     )
 }

@@ -1,32 +1,50 @@
 import {Component} from "react";
-import {NavLink} from "react-router-dom";
 import Service from "../Services/Service";
-import fox_logo from "../Image/lis-logo.png"
-import const_logo from "../Image/const.png"
-import addconst_logo from "../Image/addconst.png"
-import {FoxWindow, GetConstants, AddConstants} from "./Windows";
-let parse = require("html-react-parser")
+import "../Styles/Main.css"
+import fox_logo from "../Image/lis-logo.png";
+import const_logo from "../Image/const.png";
+import addconst_logo from "../Image/addconst.png";
+import physbrowser_logo from "../Image/physbrowser.png";
+import {
+    FoxWindow,
+    getConstants,
+    AddConstants,
+    BrowserFirstPage,
+    BrowserPhysTubePage,
+    BrowserAddPhysTubePage,
+    standart_header
+} from "./Windows";
+import {formater} from "../Utils/Utils";
+import {closeWindow, openWindow} from "../Utils/WindowsWorker"
+import {updatePage} from "../Utils/WindowsWorker";
+
 let service = new Service();
 let isDown = false;
 export default class FoxOS extends Component {
-    tops = 0;
-    lefts = 0;
     touch_x = 0;
     touch_y = 0;
     windowname = "";
-    page = 1
-    windows = ["getconst", "addconst", "foxwindow"]
+    page = 1;
+    windows = ["getconst", "addconst", "foxwindow", "browser"];
+    func = {"first": BrowserFirstPage, "physTube": BrowserPhysTubePage, "addcontent": BrowserAddPhysTubePage};
 
     constructor(props) {
         super(props);
         this.state = {
-            element_name: undefined,
-            const_value: undefined,
-            author: undefined,
-            name: undefined,
+            browser_page: "first",
+            searching: "restart-page-image",
+            addconst: {
+                element_name: undefined,
+                const_value: undefined,
+                author: undefined,
+                name: undefined,
+                description: undefined
+            },
             error: "",
             response: "",
-            constants_elements: []
+            constants_elements: [],
+            help: 0,
+            chapters: []
         }
         this.windows.forEach(data => {
             this.state[data + "o"] = 0;
@@ -35,15 +53,18 @@ export default class FoxOS extends Component {
             this.state[data + "z"] = -1;
         })
         this.Submit = this.Submit.bind(this);
-        this.input = this.input.bind(this);
-        this.position = this.position.bind(this);
-        this.mousedown = this.mousedown.bind(this);
-        this.openWindow = this.openWindow.bind(this);
-        this.close = this.close.bind(this);
         this.mouseup = this.mouseup.bind(this);
-        this.GetConstants = this.GetConstants.bind(this);
+        this.mousedown = this.mousedown.bind(this);
+        this.openWindow = openWindow.bind(this);
+        this.getConstants = this.getConstants.bind(this);
         this.backpage = this.backpage.bind(this);
         this.newpage = this.newpage.bind(this);
+        this.updatePage = updatePage.bind(this);
+        this.formater = formater.bind(this);
+        this.input = this.input.bind(this);
+        this.position = this.position.bind(this);
+        this.closeWindow = closeWindow.bind(this);
+        this.standart_header = standart_header.bind(this);
     }
 
     position(event) {
@@ -53,7 +74,10 @@ export default class FoxOS extends Component {
 
     componentDidMount() {
         document.title = "DarkFoxPhysics";
-        this.GetConstants(this.page);
+        this.getConstants(this.page);
+        service.get_chapter().then(r => {
+            this.setState({chapters: r.data.results})
+        })
         setInterval(() => {
             if (isDown) {
                 this.setState({[this.windowname + "x"]: this.x, [this.windowname + "y"]: this.y})
@@ -62,20 +86,25 @@ export default class FoxOS extends Component {
         window.addEventListener('mousemove', this.position, false)
     }
 
-    GetConstants(page) {
+    getConstants(page) {
         service.get_element(page).then(r => {
             this.setState({constants_elements: r.data.results, const_page: r.data.count})
 
         })
     }
 
+    SearchSubmit(event) {
+        event.preventDefault();
+        let data = service
+    }
+
     Submit(event) {
         event.preventDefault();
-        let data = service.send_element(this.state)
+        let data = service.send_element(this.state[event.nativeEvent.path[1].children[0].id])
         if (data.error !== undefined) {
             this.setState(data)
         }
-        data.then(r => {
+        data.then(() => {
             this.setState({error: "", response: "Успешно добавлено."})
         }).catch(err => {
             if (err.response === undefined) {
@@ -88,19 +117,17 @@ export default class FoxOS extends Component {
             }
             this.setState({error: err.response.data.error})
         })
-        this.GetConstants(this.page);
+        this.getConstants(this.page);
     }
 
     input(event) {
-        this.setState({[event.target.id]: event.target.value})
-    }
-
-    openWindow(event) {
-        if (this.state[event.target.id + "z"] === -1) {
-            this.setState({[event.target.id + "z"]: 1, [event.target.id + "o"]: 1});
-            return;
-        }
-        this.setState({[event.target.id + "z"]: -1, [event.target.id + "o"]: 0});
+        console.log(this.state)
+        this.setState({
+            [event.nativeEvent.path[2].children[0].id]: {
+                ...this.state[event.nativeEvent.path[2].children[0].id],
+                [event.target.id]: event.target.value
+            }
+        })
     }
 
     mousedown(event) {
@@ -113,34 +140,8 @@ export default class FoxOS extends Component {
         this.touch_y = event.nativeEvent.layerY;
     }
 
-    mouseup(event) {
-        this.setState({[event.target.id + "z"]: 1});
+    mouseup() {
         isDown = false;
-    }
-
-    close(event) {
-        let id = event.nativeEvent.path[1].id !== "" ? event.nativeEvent.path[1].id : event.nativeEvent.path[2].id;
-        this.setState({[id + "o"]: 0, [id + "z"]: -1});
-    }
-
-    formater(str) {
-        let best_drob = str.matchAll("[\\S]* \\/ [\\S]*")
-        let array_drob = [...best_drob]
-        array_drob.forEach(drob => {
-
-            str = str.replace(drob, "<span class='drob'><span class='updrob'>" + drob[0].split("/")[0] + "<span/><span class='downdrob'>" + drob[0].split("/")[1] + "</span></span>")
-        })
-        let best_stepen = str.matchAll("\\^[\\S]*\\s*")
-        let array_stepen = [...best_stepen]
-        array_stepen.forEach(stepen => {
-            str = str.replace(stepen, "<sup>" + stepen[0].replace("^", "") + "</sup>")
-        })
-        let best_substepen = str.matchAll("\\|[\\S]*\\s*")
-        let array_substepen = [...best_substepen]
-        array_substepen.forEach(substepen => {
-            str = str.replace(substepen, "<sub>" + substepen[0].replace("|", "") + "</sub>")
-        })
-        return parse(str)
     }
 
     backpage() {
@@ -148,31 +149,29 @@ export default class FoxOS extends Component {
             return;
         }
         this.page -= 1;
-        this.GetConstants(this.page);
+        this.getConstants(this.page);
     }
-
-    standart_header(name, id) {
-        return (
-            <div id={id} onMouseDown={this.mousedown} onMouseUp={this.mouseup}
-                 className="window-app-header">
-                <a className="nonselect">{name}</a>
-                <div onClick={this.close} className="closebutton">
-                    <a className="nonselect" onClick={this.close}>X</a>
-                </div>
-            </div>
-        )
-    }
-
 
     newpage() {
         if (this.page === Math.ceil(this.state.const_page / 5)) {
             return;
         }
         this.page += 1;
-        this.GetConstants(this.page);
+        this.getConstants(this.page);
     }
 
     render() {
+        if (this.state.help === 0) {
+            return (
+                <div>
+                    <a>Этот сайт выполнен в дизайне операционной системы</a>
+                    <p><a>К сожалению нормальное адаптирование дизайна сделать невозможно</a></p>
+                    <p><a>Использовать желательно на 1920х1080</a></p>
+                    <p><a>Для работы с сайтом нужно использовать иконки на рабочем столе \ меню быстрого доступа</a></p>
+                    <button onClick={() => this.setState({help: 1})}>OK!</button>
+                </div>
+            )
+        }
         return (
             <div>
                 <div className="display">
@@ -184,9 +183,14 @@ export default class FoxOS extends Component {
                         <img id="addconst" onClick={this.openWindow} alt="const-logo"
                              className="fox-elements ondisplay nonselect" src={addconst_logo}/>
                     </div>
-                    {GetConstants(this)}
+                    <div className="panel-element">
+                        <img id="browser" onClick={this.openWindow} alt="const-logo"
+                             className="fox-elements nonselect ondisplay" src={physbrowser_logo}/>
+                    </div>
+                    {getConstants(this)}
                     {FoxWindow(this)}
                     {AddConstants(this)}
+                    {this.func[this.state.browser_page](this)}
                 </div>
                 {/* Панель снизу */}
                 <div className="panel-bar">
@@ -205,6 +209,11 @@ export default class FoxOS extends Component {
                         <img style={{"outline": this.state.addconsto + "px solid red"}} id="addconst"
                              onClick={this.openWindow} alt="const-logo" className="fox-elements nonselect"
                              src={addconst_logo}/>
+                    </div>
+                    <div className="panel-element">
+                        <img style={{"outline": this.state.browsero + "px solid red"}} id="browser"
+                             onClick={this.openWindow} alt="const-logo" className="fox-elements nonselect"
+                             src={physbrowser_logo}/>
                     </div>
                 </div>
             </div>

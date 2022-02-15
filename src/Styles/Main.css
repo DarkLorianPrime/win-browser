@@ -23,6 +23,35 @@
     vertical-align: sub;
 }
 
+.updrob {
+    padding: 0 5px;
+}
+
+.p-abzac {
+    margin: 0.7em;
+}
+
+.downdrob {
+    padding: 0 5px;
+    display: block;
+    border-top: 1px solid black;
+}
+
+.drob {
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.downline {
+    border-bottom: 1px solid black;
+}
+
+.border-red {
+    padding: 15px;
+    border: 1px solid red;
+}
+
 .nav-link {
     margin: 0 20px 0 20px;
     color: white;
@@ -124,16 +153,18 @@
     z-index: 1;
 
 }
+
 .nonselect {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
 }
+
 .window-app {
     background-color: white;
     width: 500px;
-    height: 500px;
+    height: 600px;
     position: fixed;
     z-index: -1;
 }
@@ -144,19 +175,93 @@
     background-color: black;
     vertical-align: middle;
 }
+
 .closebutton {
     background-color: darkred;
     float: right;
     width: 50px;
 }
+
 .blue-background {
     background-color: #202230;
 }
 
 input {
-    background-color:  #282a3b;
+    background-color: #282a3b;
     color: white;
     border: 0;
     width: 50%;
     height: 30px;
+}
+
+.garry-background {
+    background-image: url(../Image/garry-class.png);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+}
+
+.what-background {
+    background-image: url(../Image/what-man.png);
+    background-repeat: no-repeat;
+    background-position: 100% 100%;
+}
+
+.black-a {
+    color: black;
+}
+
+.buttondown {
+}
+
+button {
+    border: 0;
+    background-color: rgba(255, 255, 255, 0);
+    color: #61dafb;
+}
+
+.img-browser {
+    width: 90px;
+    cursor: pointer;
+}
+
+.search-line {
+    height: 40px;
+    width: 100%;
+    background-color: lightgray;
+}
+
+.search-element {
+    color: #282c34;
+    float: left;
+    margin-top: 3px;
+    margin-left: 20px;
+    font-size: 20px;
+}
+
+.restart-page-image, .restart-page-image-process {
+    width: 30px;
+    float: left;
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.restart-page-image-process {
+    animation: move 2s infinite linear;
+}
+
+@keyframes move {
+    0% {
+        transform: rotate(360deg);
+    }
+
+    50% {
+        transform: rotate(180deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.icon-browser {
+    display: inline-block;
 }

@@ -5,18 +5,15 @@ export default class Service {
     constructor() {
     }
 
-    get_element(ids) {
-        if (ids !== undefined) {
-            return axios.get(`${url}/getelement/`, {params: {element_ids: ids}})
-        }
-        return axios.get(`${url}/getelement/`)
+    get_element(page) {
+        return axios.get(`${url}/getelement/`, {params: {page: page}})
     }
 
     send_element(state) {
         let formData = {}
         try {
             Object.keys(state).forEach(data => {
-                if ((state[data] === undefined || state[data] === '') && data !== "error") {
+                if ((state[data] === undefined || state[data] === '') && (data !== "error" && data !== "response")) {
                     throw {error: `Параметр ${data} не указан.`};
                 }
                 formData[data] = state[data]
@@ -25,5 +22,15 @@ export default class Service {
             return e;
         }
         return axios.post(`${url}/addelement/`, formData)
+    }
+
+    get_chapter() {
+        return axios.get(`${url}/chapter/`)
+    }
+
+    search(service, query) {
+        let formData = {}
+        formData["query"] = query
+        return axios.post(`${url}/search/${service}`, formData)
     }
 }
