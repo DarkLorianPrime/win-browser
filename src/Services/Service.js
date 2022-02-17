@@ -9,12 +9,12 @@ export default class Service {
         return axios.get(`${url}/getelement/`, {params: {page: page}})
     }
 
-    send_element(state) {
+    send_element(state, id) {
         let formData = {}
         try {
             Object.keys(state).forEach(data => {
                 if ((state[data] === undefined || state[data] === '') && (data !== "error" && data !== "response")) {
-                    throw {error: `Параметр ${data} не указан.`};
+                    throw {["error" + id]: `Параметр ${data} не указан.`};
                 }
                 formData[data] = state[data]
             })

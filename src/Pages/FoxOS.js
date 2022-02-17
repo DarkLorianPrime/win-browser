@@ -46,6 +46,7 @@ export default class FoxOS extends Component {
             help: 0,
             chapters: []
         }
+        this.counter = 0;
         this.windows.forEach(data => {
             this.state[data + "o"] = 0;
             this.state[data + "x"] = 0;
@@ -74,10 +75,14 @@ export default class FoxOS extends Component {
 
     componentDidMount() {
         document.title = "DarkFoxPhysics";
-        this.getConstants(this.page);
-        service.get_chapter().then(r => {
-            this.setState({chapters: r.data.results})
-        })
+        this.getConstants(this.page)
+        this.getChapters()
+        console.log("setinterval")
+        setInterval(() => {
+            console.log(this.counter++)
+            this.getConstants(this.page)
+            this.getChapters()
+        }, 16000)
         setInterval(() => {
             if (isDown) {
                 this.setState({[this.windowname + "x"]: this.x, [this.windowname + "y"]: this.y})
@@ -85,7 +90,11 @@ export default class FoxOS extends Component {
         }, 20);
         window.addEventListener('mousemove', this.position, false)
     }
-
+    getChapters() {
+        service.get_chapter().then(r => {
+            this.setState({chapters: r.data})
+        })
+    }
     getConstants(page) {
         service.get_element(page).then(r => {
             this.setState({constants_elements: r.data.results, const_page: r.data.count})
@@ -100,32 +109,31 @@ export default class FoxOS extends Component {
 
     Submit(event) {
         event.preventDefault();
-        let data = service.send_element(this.state[event.nativeEvent.path[1].children[0].id])
-        if (data.error !== undefined) {
+        let data = service.send_element(this.state[event.target.id], event.target.id)
+        if (data["error" + event.target.id] !== undefined) {
             this.setState(data)
+            return;
         }
         data.then(() => {
-            this.setState({error: "", response: "Успешно добавлено."})
+            this.setState({["error" + event.target.id]: "", ["response" + event.target.id]: "Успешно добавлено."})
         }).catch(err => {
             if (err.response === undefined) {
                 return;
             }
             if (err.response.data.error === undefined) {
                 let key = Object.keys(err.response.data)[0]
-                this.setState({error: err.response.data[key][0]})
+                this.setState({["error" + event.target.id]: err.response.data[key][0]})
                 return;
             }
-            this.setState({error: err.response.data.error})
+            this.setState({["error" + event.target.id]: err.response.data.error})
         })
         this.getConstants(this.page);
     }
 
     input(event) {
-        console.log(this.state)
         this.setState({
             [event.nativeEvent.path[2].children[0].id]: {
-                ...this.state[event.nativeEvent.path[2].children[0].id],
-                [event.target.id]: event.target.value
+                ...this.state[event.nativeEvent.path[2].children[0].id], [event.target.id]: event.target.value
             }
         })
     }

@@ -78,9 +78,9 @@ export function AddConstants(self) {
             "top": self.state.addconsty, "left": self.state.addconstx, "zIndex": self.state.addconstz
         }} className="window-app blue-background garry-background">
             {self.standart_header("Добавить Физ.Постоянную", "addconst")}
-            <a><p style={{"color": "red"}}>{self.state.error}</p></a>
-            <a><p style={{"color": "darkgreen"}}>{self.state.response}</p></a>
-            <form onSubmit={self.Submit}>
+            <a><p style={{"color": "red"}}>{self.state.erroraddconst}</p></a>
+            <a><p style={{"color": "darkgreen"}}>{self.state.responseaddconst}</p></a>
+            <form id="addconst" onSubmit={self.Submit}>
                 <label><p className="nonselect">Элемент</p></label>
                 <input onChange={self.input} id="element_name"/>
                 <label><p className="nonselect">Его постоянная величина</p></label>
@@ -168,21 +168,26 @@ export function BrowserAddPhysTubePage(self) {
                     <a className="search-element">DarkFox.phys/phystube/create</a>
                 </div>
                 <p><a>PhysTube - </a><a style={{"color": "red"}}> CREATORS</a></p>
-                <form>
+                <form id="newchapter" onSubmit={self.Submit}>
                     <p><a>Добавить новый раздел</a></p>
                     <input/>
+                    <p><button type="submit">Создать раздел</button></p>
                 </form>
                 <p><a>Добавить новое видео</a></p>
-                <p><a>Выберите раздел, куда нужно добавить видео</a></p>
-                <form>
-                    <select>
+                <label>Выберите раздел, куда нужно добавить видео</label>
+                <form id="newvideo" onSubmit={self.Submit} style={{"marginTop": "30px"}}>
+                    <select onChange={self.input}>
                         {self.state.chapters.map((values, index) => {
                             return (
-                                <option value={values["id"]}>{values["name"]}</option>
+                                <option key={index} value={values["id"]}>{values["name"]}</option>
                             )
                         })}
                     </select>
-                    <input/>
+                    <label><p>Название видео</p></label>
+                    <input id="name" onInput={self.input}/>
+                    <label><p>Ссылка на ютуб</p></label>
+                    <input id="url" onInput={self.input}/>
+                    <p><button type="submit">Создать видео</button></p>
                 </form>
             </div>
         </div>
