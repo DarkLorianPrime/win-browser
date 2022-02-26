@@ -1,5 +1,5 @@
 import axios from "axios";
-
+/* eslint-disable global-require */
 let url = "http://195.140.146.94:5003/api/v1"
 export default class Service {
     constructor() {
@@ -11,6 +11,9 @@ export default class Service {
 
     send_element(state, id) {
         let formData = {}
+        if (Object.keys(state)[0] === id) {
+            return axios.get(`${url}/${id}/`, {params: {videoquery: state[id]}})
+        }
         try {
             Object.keys(state).forEach(data => {
                 if ((state[data] === undefined || state[data] === '') && (data !== "error" && data !== "response")) {
@@ -21,11 +24,15 @@ export default class Service {
         } catch (e) {
             return e;
         }
-        return axios.post(`${url}/addelement/`, formData)
+        return axios.post(`${url}/${id}/`, formData)
     }
 
     get_chapter() {
         return axios.get(`${url}/chapter/`)
+    }
+
+    get_videos() {
+        return axios.get(`${url}/getvideos/`)
     }
 
     search(service, query) {
@@ -34,3 +41,4 @@ export default class Service {
         return axios.post(`${url}/search/${service}`, formData)
     }
 }
+/* eslint-disable global-require */

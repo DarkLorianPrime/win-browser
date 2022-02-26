@@ -3,8 +3,9 @@ import Service from "../Services/Service";
 import "../Styles/Main.css"
 import fox_logo from "../Image/lis-logo.png";
 import const_logo from "../Image/const.png";
-import addconst_logo from "../Image/addconst.png";
+import addelement_logo from "../Image/addconst.png";
 import physbrowser_logo from "../Image/physbrowser.png";
+import physconspect_logo from "../Image/physconspect.png";
 import {
     FoxWindow,
     getConstants,
@@ -12,60 +13,72 @@ import {
     BrowserFirstPage,
     BrowserPhysTubePage,
     BrowserAddPhysTubePage,
-    standart_header
+    standart_header, searchpanel, help_window
 } from "./Windows";
-import {formater} from "../Utils/Utils";
-import {closeWindow, openWindow} from "../Utils/WindowsWorker"
+import {browser_input, formater, input} from "../Utils/Utils";
+import {closeWindow, openWindow, selectpage} from "../Utils/WindowsWorker"
 import {updatePage} from "../Utils/WindowsWorker";
+import {notnulldesktop} from "./DesktopTrash";
 
 let service = new Service();
-let isDown = false;
 export default class FoxOS extends Component {
+    standart_class = "fox-elements ondisplay nonselect"
     touch_x = 0;
     touch_y = 0;
     windowname = "";
     page = 1;
-    windows = ["getconst", "addconst", "foxwindow", "browser"];
-    func = {"first": BrowserFirstPage, "physTube": BrowserPhysTubePage, "addcontent": BrowserAddPhysTubePage};
+    isDown = false;
+    windows = ["getconst", "addelement", "foxwindow", "browser", "addchapter"];
+    pages = {"first": BrowserFirstPage, "physTube": BrowserPhysTubePage, "addcontent": BrowserAddPhysTubePage, "addconspect": "null"};
 
     constructor(props) {
         super(props);
         this.state = {
             browser_page: "first",
             searching: "restart-page-image",
-            addconst: {
+            searchvideo: {
+                videoquery: undefined
+            },
+            addchapter: {
+                chapter_name: undefined
+            },
+            addelement: {
                 element_name: undefined,
                 const_value: undefined,
                 author: undefined,
                 name: undefined,
                 description: undefined
             },
-            error: "",
-            response: "",
+            addvideo: {
+                video_name: undefined,
+                video_url: undefined,
+                chapters: [0,]
+            },
             constants_elements: [],
             help: 0,
             chapters: []
         }
-        this.counter = 0;
-        this.windows.forEach(data => {
-            this.state[data + "o"] = 0;
-            this.state[data + "x"] = 0;
-            this.state[data + "y"] = 0;
-            this.state[data + "z"] = -1;
-        })
         this.Submit = this.Submit.bind(this);
-        this.mouseup = this.mouseup.bind(this);
         this.mousedown = this.mousedown.bind(this);
         this.openWindow = openWindow.bind(this);
         this.getConstants = this.getConstants.bind(this);
-        this.backpage = this.backpage.bind(this);
-        this.newpage = this.newpage.bind(this);
+        this.selectpage = selectpage.bind(this);
         this.updatePage = updatePage.bind(this);
         this.formater = formater.bind(this);
-        this.input = this.input.bind(this);
+        this.input = input.bind(this);
+        this.searchpanel = searchpanel.bind(this);
+        this.browserinput = browser_input.bind(this);
         this.position = this.position.bind(this);
         this.closeWindow = closeWindow.bind(this);
         this.standart_header = standart_header.bind(this);
+        this.notnulldesktop = notnulldesktop.bind(this);
+        this.update = this.update.bind(this);
+    }
+
+    update() {
+        this.getConstants(this.page);
+        this.getChapters();
+        this.getVideos();
     }
 
     position(event) {
@@ -74,42 +87,44 @@ export default class FoxOS extends Component {
     }
 
     componentDidMount() {
-        document.title = "DarkFoxPhysics";
-        this.getConstants(this.page)
-        this.getChapters()
-        console.log("setinterval")
+        document.title = "Физика. Механика.";
+        this.windows.forEach(data => {
+            this.setState({[data + "o"]: 0, [data + "x"]: 0, [data + "y"]: 0, [data + "z"]: -1});
+        })
+        this.update()
         setInterval(() => {
-            console.log(this.counter++)
-            this.getConstants(this.page)
-            this.getChapters()
-        }, 16000)
+            this.update()
+        }, 60000)
         setInterval(() => {
-            if (isDown) {
+            if (this.isDown) {
                 this.setState({[this.windowname + "x"]: this.x, [this.windowname + "y"]: this.y})
             }
         }, 20);
         window.addEventListener('mousemove', this.position, false)
     }
+
+    getVideos() {
+        service.get_videos().then(r => {
+            this.setState({videos: r.data})
+        })
+    }
+
     getChapters() {
         service.get_chapter().then(r => {
             this.setState({chapters: r.data})
         })
     }
+
     getConstants(page) {
         service.get_element(page).then(r => {
             this.setState({constants_elements: r.data.results, const_page: r.data.count})
-
         })
     }
 
-    SearchSubmit(event) {
-        event.preventDefault();
-        let data = service
-    }
-
     Submit(event) {
+        let data;
         event.preventDefault();
-        let data = service.send_element(this.state[event.target.id], event.target.id)
+        data = service.send_element(this.state[event.target.id], event.target.id)
         if (data["error" + event.target.id] !== undefined) {
             this.setState(data)
             return;
@@ -117,9 +132,6 @@ export default class FoxOS extends Component {
         data.then(() => {
             this.setState({["error" + event.target.id]: "", ["response" + event.target.id]: "Успешно добавлено."})
         }).catch(err => {
-            if (err.response === undefined) {
-                return;
-            }
             if (err.response.data.error === undefined) {
                 let key = Object.keys(err.response.data)[0]
                 this.setState({["error" + event.target.id]: err.response.data[key][0]})
@@ -127,19 +139,11 @@ export default class FoxOS extends Component {
             }
             this.setState({["error" + event.target.id]: err.response.data.error})
         })
-        this.getConstants(this.page);
-    }
-
-    input(event) {
-        this.setState({
-            [event.nativeEvent.path[2].children[0].id]: {
-                ...this.state[event.nativeEvent.path[2].children[0].id], [event.target.id]: event.target.value
-            }
-        })
+        this.update();
     }
 
     mousedown(event) {
-        isDown = true;
+        this.isDown = true;
         this.setState({[event.target.id + "z"]: 2});
         this.windowname = event.target.id
         this.x = event.nativeEvent.x - event.nativeEvent.layerX
@@ -148,81 +152,53 @@ export default class FoxOS extends Component {
         this.touch_y = event.nativeEvent.layerY;
     }
 
-    mouseup() {
-        isDown = false;
+    ondisplaylogo(id, logo) {
+        return (
+            <div className="panel-element">
+                <img id={id} onClick={this.openWindow} alt="const-logo" className={this.standart_class} src={logo}/>
+            </div>
+        )
     }
 
-    backpage() {
-        if (this.page - 1 === 0) {
-            return;
-        }
-        this.page -= 1;
-        this.getConstants(this.page);
-    }
-
-    newpage() {
-        if (this.page === Math.ceil(this.state.const_page / 5)) {
-            return;
-        }
-        this.page += 1;
-        this.getConstants(this.page);
+    onpanellogo(id, logo, open) {
+        return (
+            <div className="panel-element">
+                <img style={{"outline": open + "px solid red"}} id={id}
+                     onClick={this.openWindow} alt="const-logo" className="fox-elements nonselect" src={logo}/>
+            </div>
+        )
     }
 
     render() {
         if (this.state.help === 0) {
-            return (
-                <div>
-                    <a>Этот сайт выполнен в дизайне операционной системы</a>
-                    <p><a>К сожалению нормальное адаптирование дизайна сделать невозможно</a></p>
-                    <p><a>Использовать желательно на 1920х1080</a></p>
-                    <p><a>Для работы с сайтом нужно использовать иконки на рабочем столе \ меню быстрого доступа</a></p>
-                    <button onClick={() => this.setState({help: 1})}>OK!</button>
-                </div>
-            )
+            return (<div>{help_window(this)}</div>)
         }
         return (
             <div>
                 <div className="display">
-                    <div className="panel-element">
-                        <img id="getconst" onClick={this.openWindow} alt="const-logo"
-                             className="fox-elements ondisplay nonselect" src={const_logo}/>
+                    {/* Иконки на рабочем столе*/}
+                    <div className="icons">
+                        {this.ondisplaylogo("getconst", const_logo)}
+                        {this.ondisplaylogo("addelement", addelement_logo)}
+                        {this.ondisplaylogo("browser", physbrowser_logo)}
+                        {this.ondisplaylogo("conspect", physconspect_logo)}
+                        {this.notnulldesktop()}
                     </div>
-                    <div className="panel-element">
-                        <img id="addconst" onClick={this.openWindow} alt="const-logo"
-                             className="fox-elements ondisplay nonselect" src={addconst_logo}/>
+                    {/* Окна приложений */}
+                    <div className="windows">
+                        {getConstants(this)}
+                        {FoxWindow(this)}
+                        {AddConstants(this)}
+                        {this.pages[this.state.browser_page](this)}
                     </div>
-                    <div className="panel-element">
-                        <img id="browser" onClick={this.openWindow} alt="const-logo"
-                             className="fox-elements nonselect ondisplay" src={physbrowser_logo}/>
-                    </div>
-                    {getConstants(this)}
-                    {FoxWindow(this)}
-                    {AddConstants(this)}
-                    {this.func[this.state.browser_page](this)}
                 </div>
-                {/* Панель снизу */}
+                {/* Панель задач */}
                 <div className="panel-bar">
-                    <div className="panel-element">
-                        <img style={{"outline": this.state.foxwindowo + "px solid red"}}
-                             id="foxwindow" onClick={this.openWindow} alt="lis-logo"
-                             className="fox-elements nonselect"
-                             src={fox_logo}/>
-                    </div>
-                    <div className="panel-element">
-                        <img style={{"outline": this.state.getconsto + "px solid red"}} id="getconst"
-                             onClick={this.openWindow} alt="const-logo" className="fox-elements nonselect"
-                             src={const_logo}/>
-                    </div>
-                    <div className="panel-element">
-                        <img style={{"outline": this.state.addconsto + "px solid red"}} id="addconst"
-                             onClick={this.openWindow} alt="const-logo" className="fox-elements nonselect"
-                             src={addconst_logo}/>
-                    </div>
-                    <div className="panel-element">
-                        <img style={{"outline": this.state.browsero + "px solid red"}} id="browser"
-                             onClick={this.openWindow} alt="const-logo" className="fox-elements nonselect"
-                             src={physbrowser_logo}/>
-                    </div>
+                    {this.onpanellogo("foxwindow", fox_logo, this.state.foxwindowo)}
+                    {this.onpanellogo("getconst", const_logo, this.state.getconsto)}
+                    {this.onpanellogo("addelement", addelement_logo, this.state.addelemento)}
+                    {this.onpanellogo("browser", physbrowser_logo, this.state.browsero)}
+                    {this.onpanellogo("conspect", physconspect_logo, this.state.conspecto)}
                 </div>
             </div>
         )

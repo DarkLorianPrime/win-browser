@@ -16,4 +16,21 @@ export function updatePage() {
     setTimeout(() => {
         this.setState({searching: "restart-page-image"})
     }, 2000)
+    this.update()
+}
+
+export function selectpage(event) {
+    switch (event.target.id) {
+        case "back":
+            if (this.page - 1 !== 0) {
+                this.page -= 1;
+            }
+            break;
+        case "next":
+            if (this.page !== Math.ceil(this.state.const_page / 5)) {
+                this.page += 1;
+            }
+            break;
+    }
+    this.getConstants(this.page);
 }

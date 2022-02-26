@@ -47,6 +47,11 @@
     border-bottom: 1px solid black;
 }
 
+.downline-white {
+    padding: 5px;
+    border-bottom: 1px solid white;
+}
+
 .border-red {
     padding: 15px;
     border: 1px solid red;
@@ -91,49 +96,21 @@
     opacity: 1;
 }
 
+.fox-elements-help {
+    width: 5%;
+    vertical-align: middle;
+}
+
 .fox-elements:hover {
     background-color: gray;
 }
 
+.help-a {
+    font-size: 25px;
+}
+
 .panel-text {
     vertical-align: middle;
-}
-
-@media only screen and (max-width: 1300px) {
-    .nav-link {
-        font-size: 20px;
-    }
-
-    .logo_Dark {
-        font-size: 20px;
-    }
-
-    .description {
-        font-size: 20px;
-    }
-}
-
-@media only screen and (max-width: 1000px) {
-    .fox-elements {
-        width: 10vw;
-        margin-right: 0.5vw;
-    }
-
-    .panel-bar {
-        height: 6%;
-    }
-
-    .nav-link {
-        font-size: 15px;
-    }
-
-    .logo_Dark {
-        font-size: 15px;
-    }
-
-    .description {
-        font-size: 15px;
-    }
 }
 
 #root {
@@ -205,16 +182,20 @@ input {
     background-repeat: no-repeat;
     background-position: 100% 100%;
 }
+
 select {
-    background: rgba(255,255,255,0);
+    background: rgba(255, 255, 255, 0);
     border: 0;
     color: white;
     width: 20%;
     font-size: 20px;
 }
+
 option {
-    background: rgba(255,255,255,0)
+    background: rgba(255, 255, 255, 0);
+    color: black;
 }
+
 .black-a {
     color: black;
 }
@@ -228,9 +209,23 @@ button {
     color: #61dafb;
 }
 
+.red {
+    color: red;
+}
+
 .img-browser {
     width: 90px;
     cursor: pointer;
+}
+
+.phystube-container {
+    overflow: auto;
+    height: 835px;
+}
+
+.video-text {
+    display: block;
+    background-color: #202230;
 }
 
 .search-line {
@@ -272,5 +267,11 @@ button {
 }
 
 .icon-browser {
+    display: inline-block;
+}
+
+.youtube-rolicks {
+    margin: 20px;
+    width: 260px;
     display: inline-block;
 }
