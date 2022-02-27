@@ -1,0 +1,8 @@
+[DjangoRest]
+physicproject=main
+calculator=app
+[React]
+frontend
+
+# node_modules в комплекте не идут, ибо там +- 50000 файлов.
+# .env - личные данные от postgresql.
