@@ -1,11 +1,17 @@
 from rest_framework.serializers import ModelSerializer
 
-from calculator.models import ConstElement, VideoHelp, Chapter
+from calculator.models import ConstElement, VideoHelp, Chapter, Conspect
 
 
 class ConstSerializer(ModelSerializer):
     class Meta:
         model = ConstElement
+        fields = "__all__"
+
+
+class ConspectSerializer(ModelSerializer):
+    class Meta:
+        model = Conspect
         fields = "__all__"
 
 

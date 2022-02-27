@@ -13,10 +13,16 @@ class ConstElement(models.Model):
 
 
 class Chapter(models.Model):
-    name = models.CharField(max_length=255)
+    chapter_name = models.CharField(max_length=255)
+    videos = models.ManyToManyField("VideoHelp", blank=True)
+    conspects = models.ManyToManyField("Conspect", blank=True)
 
 
 class VideoHelp(models.Model):
+    video_name = models.CharField(max_length=255)
+    video_url = models.URLField()
+
+
+class Conspect(models.Model):
     name = models.CharField(max_length=255)
-    chapters = models.ManyToManyField("Chapter")
-    url = models.URLField()
+    text = models.TextField()
